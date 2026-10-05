@@ -1,0 +1,4 @@
+/node_modules
+/demo/build
+.DS_Store
+# dist is committed on purpose: installing from GitHub needs no build step.

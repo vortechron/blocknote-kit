@@ -1,0 +1,619 @@
+/* @vortechron/blocknote-kit editor styles.
+
+   Load BlockNote's own styles first:
+     import '@blocknote/mantine/style.css';
+     import '@vortechron/blocknote-kit/style.css';
+
+   The editor surface is .bnk-blocknote. It is drawn the way the public page
+   shows a section (white, light scheme) even inside a dark admin theme. */
+
+/* The editor surface: roomy and document-like. It spans the whole width, like
+   a section on the public page, while the text column inside it keeps the
+   section's content width. --bnk-block-width comes from appearanceToSurface()
+   (or the host page, when it draws the surface itself). */
+.bnk-blocknote .bn-editor {
+    min-height: 9rem;
+    border-radius: 0.5rem;
+    max-width: var(--bnk-block-width, 53rem);
+    margin-inline: auto;
+}
+
+/* The outline sits on the wrapper, not on .bn-container, because the wrapper's
+   edge is the block edge - the furthest a stretched item may reach. */
+.bnk-blocknote {
+    border: 1px solid rgb(226 232 240);
+    border-radius: 0.5rem;
+    /* The block is drawn the way the public page shows it: on white, in a
+       light scheme, even inside a dark panel. A block background paints over
+       this from the inline style. */
+    background-color: #fff;
+    color: #1f2937;
+    color-scheme: light;
+}
+
+.bnk-blocknote .bn-container {
+    /* Positions the width drag handles in .bnk-width-layer */
+    position: relative;
+}
+
+/* Live background preview while editing. The wrapper carries a flat colour
+   and a set of --bnk-bg-* variables via an inline style (see
+   appearanceToSurface()); the picture and the tint are
+   drawn by ::before / ::after so the blur never touches the text.
+   isolation: isolate keeps the pseudo layers below the editor (negative
+   z-index) and stops a blended tint mixing with the page. No overflow:hidden
+   here - it would clip the width drag handles at the block edge; the blurred
+   layer clips itself with clip-path instead. */
+.bnk-blocknote-has-bg {
+    position: relative;
+    isolation: isolate;
+    border-radius: 0.75rem;
+    border-color: transparent;
+    padding: 2rem 1rem;
+}
+
+.bnk-blocknote-has-media::before,
+.bnk-blocknote-has-media::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.bnk-blocknote-has-media::before {
+    inset: calc(-2 * var(--bnk-bg-blur, 0px));
+    z-index: -2;
+    background-image: var(--bnk-bg-image, none);
+    background-size: cover;
+    background-position: var(--bnk-bg-position, center);
+    filter: blur(var(--bnk-bg-blur, 0px));
+    clip-path: inset(calc(2 * var(--bnk-bg-blur, 0px)) round 0.75rem);
+}
+
+.bnk-blocknote-has-media::after {
+    inset: 0;
+    z-index: -1;
+    background-color: var(--bnk-bg-tint, #0f172a);
+    opacity: var(--bnk-bg-tint-opacity, 0);
+    mix-blend-mode: var(--bnk-bg-tint-blend, normal);
+}
+
+.bnk-blocknote-has-bg .bn-container {
+    --bn-colors-editor-background: transparent;
+}
+
+.bnk-blocknote-has-bg .bn-editor {
+    background: transparent;
+}
+
+.bnk-blocknote-light-text .bn-container {
+    --bn-colors-editor-text: #ffffff;
+    --bn-colors-side-menu: #e2e8f0;
+}
+
+.bnk-blocknote-light-text .bn-editor {
+    color: #fff;
+}
+
+/* A YouTube, Vimeo or Loom link in a video block renders as the host's player
+   (video-embed.js). An iframe has no intrinsic size the way a
+   video file does, so it needs the 16:9 shape spelled out. */
+.bnk-blocknote iframe.bnk-video-embed {
+    aspect-ratio: 16 / 9;
+    border: 0;
+    border-radius: 4px;
+}
+
+/* BlockNote sizes a media block to its content: it puts an inline
+   `width: fit-content` on the wrapper and lets the video file's own size fill
+   it. An iframe has no such size, so it would fall back to the HTML default of
+   300px. !important is needed to beat that inline style.
+
+   Once the user drags the resize handle the iframe carries a width attribute,
+   this rule stops matching, and fit-content sizes the player as usual. */
+.bnk-blocknote .bn-file-block-content-wrapper:has(iframe.bnk-video-embed:not([width])),
+.bnk-blocknote .bn-visual-media-wrapper:has(> iframe.bnk-video-embed:not([width])) {
+    width: 100% !important;
+}
+
+/* Background video preview (BlockNoteEditor::backgroundVideo). The layer is
+   its own size container so the 16:9 player can be sized to cover it. */
+.bnk-blocknote-media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+    container-type: size;
+}
+
+.bnk-blocknote-media video {
+    position: absolute;
+    inset: calc(-2 * var(--bnk-bg-blur, 0px));
+    width: calc(100% + 4 * var(--bnk-bg-blur, 0px));
+    height: calc(100% + 4 * var(--bnk-bg-blur, 0px));
+    object-fit: cover;
+    object-position: var(--bnk-bg-position, center);
+    filter: blur(var(--bnk-bg-blur, 0px));
+}
+
+.bnk-blocknote-media iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: auto;
+    height: calc(max(100cqh, calc(100cqw * 9 / 16)) + 4 * var(--bnk-bg-blur, 0px));
+    aspect-ratio: 16 / 9;
+    transform: translate(-50%, -50%);
+    border: 0;
+    filter: blur(var(--bnk-bg-blur, 0px));
+}
+
+/* "Background card": the text sits on a white card over the picture. */
+.bnk-blocknote-card .bn-editor {
+    background: #fff;
+    border-radius: 1rem;
+    padding-block: 2rem;
+    box-shadow: 0 20px 40px rgb(15 23 42 / 0.18);
+}
+
+/* Per-item width: drag an item's edge to make it span fewer of the 12 grid
+   columns, like Qwilr. The `width` prop comes from item-width.jsx
+   and BlockNote writes it out as data-width; the public page gets the same
+   widths from BlockNoteRenderer::constrainWidth(). A full-width item carries no
+   attribute, so nothing here touches it.
+
+   A column layout is its own element (.bn-block-column-list) rather than block
+   content, so every rule has to cover both. */
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="1"] { width: 8.3333%; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="2"] { width: 16.6667%; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="3"] { width: 25%; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="4"] { width: 33.3333%; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="5"] { width: 41.6667%; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="6"] { width: 50%; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="7"] { width: 58.3333%; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="8"] { width: 66.6667%; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="9"] { width: 75%; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="10"] { width: 83.3333%; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="11"] { width: 91.6667%; }
+
+.bnk-blocknote .bn-block-content[data-width][data-text-alignment="center"] {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.bnk-blocknote .bn-block-content[data-width][data-text-alignment="right"] {
+    margin-left: auto;
+}
+
+/* Above 12 the item stretches past the block padding, towards the wrapper's
+   edge. --bnk-bleed-full is that edge in pixels; BlockWidthHandles keeps it
+   up to date with a ResizeObserver, because a CSS container query here would
+   break BlockNote's floating menus. The public page fills the same variable
+   with a container query instead (the page renderer's page.css). */
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list):is(
+    [data-width="13"], [data-width="14"], [data-width="15"],
+    [data-width="16"], [data-width="17"], [data-width="18"]
+) {
+    width: calc(100% + (var(--bnk-bleed-full, 100%) - 100%) * var(--bnk-bleed, 0));
+    margin-left: calc((100% - var(--bnk-bleed-full, 100%)) * var(--bnk-bleed, 0) / 2);
+    margin-right: 0;
+}
+
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="13"] { --bnk-bleed: 0.1667; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="14"] { --bnk-bleed: 0.3333; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="15"] { --bnk-bleed: 0.5; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="16"] { --bnk-bleed: 0.6667; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="17"] { --bnk-bleed: 0.8333; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-width="18"] { --bnk-bleed: 1; }
+
+/* Per-item spacing: the space above and below one item, on top of whatever
+   padding the block itself has. The `spaceTop` / `spaceBottom` props come from
+   item-spacing.jsx and BlockNote writes them out as
+   data-space-top / data-space-bottom. An item left at `none` carries no
+   attribute, so nothing here touches it.
+
+   Padding, not margin, and the same on the public page
+   (BlockNoteRenderer::applySpacing): a margin would collapse into the
+   paragraph's own margin and the gap would come out smaller than it looks
+   here. Keep these sizes in sync with App\Enums\BlockSpacing::css(). */
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-space-top="sm"] { padding-top: 1rem; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-space-top="md"] { padding-top: 2rem; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-space-top="lg"] { padding-top: 3.5rem; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-space-top="xl"] { padding-top: 6rem; }
+
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-space-bottom="sm"] { padding-bottom: 1rem; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-space-bottom="md"] { padding-bottom: 2rem; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-space-bottom="lg"] { padding-bottom: 3.5rem; }
+.bnk-blocknote :is(.bn-block-content, .bn-block-column-list)[data-space-bottom="xl"] { padding-bottom: 6rem; }
+
+/* The handles and the column guide float above the editor. The layer itself
+   never swallows clicks; only the two handles do. */
+.bnk-width-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* The frame only exists while an item is tracked under the pointer, so it does
+   not need a :hover gate as well - and a gate on .bn-container would be one
+   more thing to get wrong for an item stretched past that container's edge. */
+.bnk-width-frame {
+    position: absolute;
+    border-radius: 0.25rem;
+    outline: 1px solid rgb(147 197 253);
+    outline-offset: 2px;
+}
+
+.bnk-width-frame.is-dragging {
+    background-color: rgb(59 130 246 / 0.08);
+}
+
+/* Clicking an item pins the frame so it stays while the pointer travels to a
+   handle. A heavier outline is the only signal that the pin is on. */
+.bnk-width-frame.is-pinned {
+    outline-width: 2px;
+    outline-color: rgb(59 130 246);
+}
+
+.bnk-width-frame.is-pinned .bnk-width-handle::after {
+    background: rgb(59 130 246);
+    border-color: #fff;
+}
+
+/* The grab area is deliberately much larger than the dot you see, so the
+   handle is easy to catch. The dot itself is drawn with ::after. */
+.bnk-width-handle {
+    position: absolute;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 2.25rem;
+    cursor: ew-resize;
+    pointer-events: auto;
+    touch-action: none;
+}
+
+.bnk-width-handle::after {
+    content: '';
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 2px solid rgb(59 130 246);
+    border-radius: 9999px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.25);
+    transition: transform 100ms ease-out;
+}
+
+.bnk-width-handle:hover::after,
+.bnk-width-frame.is-dragging .bnk-width-handle::after {
+    transform: scale(1.3);
+}
+
+.bnk-width-handle.is-start {
+    left: 0;
+    transform: translate(-50%, -50%);
+}
+
+.bnk-width-handle.is-end {
+    right: 0;
+    transform: translate(50%, -50%);
+}
+
+.bnk-width-readout {
+    position: absolute;
+    top: -1.6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 0.25rem;
+    background: rgb(30 41 59);
+    padding: 0.1rem 0.4rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* The pale stripes that show where the drag will snap to: twelve across the
+   text column, plus the stretch steps in the gap on each side. */
+.bnk-width-grid {
+    position: absolute;
+    display: flex;
+    pointer-events: none;
+}
+
+.bnk-width-grid-part {
+    display: flex;
+    gap: 2px;
+    padding-inline: 1px;
+}
+
+.bnk-width-grid-part span {
+    flex: 1 1 0;
+    border-radius: 2px;
+    background-color: rgb(59 130 246 / 0.12);
+}
+
+.bnk-width-grid-part.is-gutter span {
+    background-color: rgb(59 130 246 / 0.22);
+}
+
+/* Typeface picker: the little "Aa" drawn in each font's own face */
+.bnk-font-swatch {
+    display: inline-block;
+    min-width: 1.5rem;
+    font-size: 0.875rem;
+    line-height: 1;
+}
+
+/* Spacer block: invisible in output, visible while editing */
+.bnk-blocknote .bnk-spacer {
+    position: relative;
+    border-radius: 0.375rem;
+    outline: 1px dashed transparent;
+}
+
+.bnk-blocknote .bnk-spacer:hover {
+    outline-color: rgb(148 163 184);
+}
+
+.bnk-blocknote .bnk-spacer-controls {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    opacity: 0;
+}
+
+.bnk-blocknote .bnk-spacer:hover .bnk-spacer-controls {
+    opacity: 1;
+}
+
+.bnk-blocknote .bnk-spacer-controls button {
+    border-radius: 0.25rem;
+    background: rgb(226 232 240);
+    padding: 0.05rem 0.4rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: rgb(71 85 105);
+}
+
+.bnk-blocknote .bnk-spacer-controls button.is-active {
+    background: #4f46e5;
+    color: #fff;
+}
+
+/* Card block (blocks/card.jsx). The banner and the title are the block
+   itself; the blocks nested under it are the body, drawn as the card's white
+   panel so it is clear what folds away for the reader. The public page draws
+   the real thing with .bn-card. */
+.bnk-blocknote .bnk-card {
+    width: 100%;
+}
+
+.bnk-blocknote .bnk-card-head {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 3.25rem;
+    padding: 0.85rem 1rem;
+    overflow: hidden;
+    border: 1px solid rgb(226 232 240);
+    border-radius: 0.75rem 0.75rem 0 0;
+    background: #fff;
+}
+
+.bnk-blocknote .bnk-card-head.has-image {
+    min-height: 9rem;
+    border-color: transparent;
+}
+
+.bnk-blocknote .bnk-card-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+.bnk-blocknote .bnk-card-head.has-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.7), rgb(0 0 0 / 0) 65%);
+    pointer-events: none;
+}
+
+.bnk-blocknote .bnk-card-title {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #111827;
+}
+
+.bnk-blocknote .bnk-card-head.has-image .bnk-card-title {
+    color: #fff;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 0.45);
+}
+
+.bnk-blocknote .bnk-card-toggle {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    border-radius: 0.375rem;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    user-select: none;
+}
+
+.bnk-blocknote .bnk-card-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid rgb(226 232 240);
+    border-top: 0;
+    background: rgb(248 250 252);
+    font-size: 0.7rem;
+}
+
+.bnk-blocknote .bnk-card-controls > button {
+    border-radius: 0.25rem;
+    background: rgb(226 232 240);
+    padding: 0.15rem 0.5rem;
+    font-weight: 600;
+    color: rgb(71 85 105);
+}
+
+.bnk-blocknote .bnk-card-controls > button.is-active {
+    background: #4f46e5;
+    color: #fff;
+}
+
+.bnk-blocknote .bnk-card-swatches {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: 0.25rem;
+}
+
+.bnk-blocknote .bnk-card-swatches button {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 9999px;
+    box-shadow: inset 0 0 0 1px rgb(15 23 42 / 0.2);
+}
+
+.bnk-blocknote .bnk-card-swatches button.is-active {
+    outline: 2px solid #4f46e5;
+    outline-offset: 1px;
+}
+
+.bnk-blocknote .bnk-card-swatches input[type='color'] {
+    width: 1.4rem;
+    height: 1.4rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.bnk-blocknote .bnk-card-hint {
+    margin: 0;
+    padding: 0.4rem 0.6rem;
+    border: 1px dashed rgb(203 213 225);
+    border-top: 0;
+    border-radius: 0 0 0.75rem 0.75rem;
+    font-size: 0.75rem;
+    color: rgb(100 116 139);
+}
+
+/* The body: the blocks nested under a card. A React block's content sits in a
+   .node-card wrapper, so that, not .bn-block-content, is the sibling of the
+   nested group. The card does not re-render when its children change, so the
+   hint is hidden here rather than in card-block.jsx. */
+.bnk-blocknote .bn-block:has(> .bn-block-group) > .node-card .bnk-card-hint {
+    display: none;
+}
+
+/* BlockNote's grey nesting line would sit outside the white panel. */
+.bnk-blocknote .bn-block:has(> .node-card) > .bn-block-group > .bn-block-outer::before {
+    display: none;
+}
+
+/* The panel is white even when the section behind it is a photo, so it undoes
+   .bnk-blocknote-light-text, or its text would be white on white. */
+.bnk-blocknote .bn-block:has(> .node-card) > .bn-block-group {
+    --bn-colors-editor-text: #1f2937;
+    color: #1f2937;
+    margin-left: 0;
+    padding: 0.5rem 0.75rem 0.75rem;
+    border: 1px solid rgb(226 232 240);
+    border-top: 0;
+    border-radius: 0 0 0.75rem 0.75rem;
+    background: #fff;
+}
+
+
+/* BlockNote paints a few parts dark whenever an ancestor has the `dark`
+   class, which admin themes (Filament, Tailwind) set on <html> in dark mode.
+   The editor always shows the page the way the public sees it, which is
+   light, so these keep their
+   light colours. Selectors are scoped to .bnk-blocknote, which beats
+   BlockNote's zero-specificity :where(.dark) rules. */
+.bnk-blocknote .bn-preview-placeholder,
+.bnk-blocknote [data-file-block] .bn-add-file-button {
+    color: #5f5b5c;
+    background-color: #f2f1ee;
+}
+
+.bnk-blocknote .bn-editor[contenteditable=true] .bn-preview-placeholder:not(.bn-preview-placeholder-error):hover,
+.bnk-blocknote .bn-editor[contenteditable=true] [data-file-block] .bn-add-file-button:hover,
+.bnk-blocknote [data-file-block] .bn-file-name-with-icon:hover,
+.bnk-blocknote .ProseMirror-selectednode .bn-file-name-with-icon {
+    background-color: #e1e1e1;
+}
+
+.bnk-blocknote .bn-editor[contenteditable=true] .bn-column-list-hovered > .bn-block-column:not(:last-child) {
+    box-shadow: 4px 0 #eee;
+}
+
+.bnk-blocknote .bn-editor[contenteditable=true] .bn-column-list-hovered > .bn-block-column.bn-column-resize-border {
+    box-shadow: 4px 0 #ccc;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Media library sheet (MediaLibraryDialog) and its cards.
+   --------------------------------------------------------------------------- */
+.bnk-library-card { display: block; width: 100%; text-align: left; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; cursor: pointer; transition: border-color 120ms, box-shadow 120ms; }
+.bnk-library-card:hover, .bnk-library-card:focus-visible, .bnk-library-card[aria-pressed='true'] { border-color: #6366f1; box-shadow: 0 0 0 2px #e0e7ff; outline: none; }
+.bnk-library-card:disabled { opacity: .6; cursor: wait; }
+.bnk-library-card-caption { display: grid; gap: .25rem; padding: .875rem 1rem; font-size: .875rem; border-top: 1px solid #e5e7eb; }
+.bnk-library-card-caption strong { font-weight: 600; }
+.bnk-library-card-caption > span { color: #6b7280; font-size: .75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bnk-library-pagination, .bnk-library-links { display: flex; justify-content: space-between; align-items: center; gap: .75rem; margin-top: 1.25rem; font-size: .75rem; }
+.bnk-media-thumbnail { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #f4f4f6; border-radius: 6px; }
+.bnk-media-thumbnail img, .bnk-media-thumbnail video { width: 100%; height: 100%; object-fit: contain; }
+.bnk-media-video-label { position: absolute; bottom: .5rem; left: .5rem; display: inline-flex; align-items: center; gap: .25rem; border-radius: 4px; padding: .25rem .5rem; color: white; background: #191922c9; font: 12px/1.2 sans-serif; }
+.bnk-media-document { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .375rem; width: 100%; height: 100%; color: #6b7280; font: 600 12px/1.2 sans-serif; letter-spacing: .05em; }
+.bnk-media-dialog { position: fixed; inset: 0 auto 0 0; width: min(28rem, 100vw); height: 100dvh; max-width: 100vw; max-height: 100dvh; margin: 0; padding: 1.5rem; border: 0; background: #fff; color: #191922; overflow-y: auto; font-size: 14px; line-height: 1.5; font-family: inherit; box-shadow: 5px 0 30px #0002; }
+.bnk-media-dialog::backdrop { background: #19192255; }
+.bnk-media-dialog-header { display: flex; gap: 1rem; justify-content: space-between; align-items: start; }
+.bnk-media-dialog-header h2 { font-size: 20px; font-weight: 600; line-height: 1.3; font-family: inherit; margin: 0; color: #191922; }
+.bnk-media-dialog-header p { font-size: 13px; color: #6b7280; margin-top: .5rem; }
+.bnk-media-dialog-header > button { font-size: 26px; line-height: 1; cursor: pointer; padding: .25rem; }
+.bnk-media-dialog-tools { display: grid; gap: .75rem; margin: 1.5rem 0; }
+.bnk-media-dialog-tools > input { border: 1px solid #d1d5db; border-radius: 6px; padding: .65rem .8rem; width: 100%; color: #191922; background: white; }
+.bnk-media-upload { display: inline-flex; align-items: center; justify-content: center; width: fit-content; padding: .45rem .8rem; border-radius: 4px; background: #4f46e5; color: white; cursor: pointer; }
+.bnk-media-upload input { width: 1px; height: 1px; opacity: 0; position: absolute; }
+.bnk-media-upload:focus-within { outline: 2px solid #818cf8; outline-offset: 3px; }
+.bnk-media-dialog-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.bnk-media-dialog-grid .bnk-library-card-caption { padding: .5rem; font-size: .75rem; overflow-wrap: anywhere; }
+.bnk-media-error { color: #b91c1c; padding: .75rem 0; }
+.bnk-media-error button { text-decoration: underline; }
+.bnk-media-status { color: #6b7280; grid-column: 1 / -1; padding: 1rem 0; }
+@media (prefers-reduced-motion: reduce) { .bnk-library-card { transition: none; } }
+.bnk-library-card { color: #1f2937; }
+.bnk-media-video-label-icon { width: .75rem; height: .75rem; }
+.bnk-media-document-icon { width: 2.5rem; height: 2.5rem; }
+
+/* The cards are white, so their text stays dark in a dark admin theme. */
+.bnk-library-card { color: #1f2937; }

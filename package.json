@@ -1,0 +1,56 @@
+{
+    "name": "@vortechron/blocknote-kit",
+    "version": "0.1.0",
+    "description": "Extra blocks and tools for BlockNote: resizable columns, per-item width and spacing, a spacer, fold-out cards, video embeds, a font picker, a media library sheet and section backgrounds.",
+    "keywords": ["blocknote", "editor", "page-builder", "react", "columns", "notion"],
+    "license": "GPL-3.0-or-later",
+    "homepage": "https://github.com/vortechron/blocknote-kit",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/vortechron/blocknote-kit.git"
+    },
+    "author": "Vortechron (https://vortechron.com)",
+    "type": "module",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./types/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./types/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./style.css": "./dist/style.css"
+    },
+    "files": [
+        "dist",
+        "types",
+        "README.md",
+        "LICENSE"
+    ],
+    "sideEffects": [
+        "*.css"
+    ],
+    "scripts": {
+        "build": "node build.js",
+        "test": "vitest run",
+        "demo": "node demo/serve.js"
+    },
+    "peerDependencies": {
+        "@blocknote/core": ">=0.54.0 <0.55.0",
+        "@blocknote/mantine": ">=0.54.0 <0.55.0",
+        "@blocknote/react": ">=0.54.0 <0.55.0",
+        "@blocknote/xl-multi-column": ">=0.54.0 <0.55.0",
+        "react": "^18.2.0 || ^19.0.0",
+        "react-dom": "^18.2.0 || ^19.0.0"
+    },
+    "devDependencies": {
+        "@blocknote/core": "0.54.0",
+        "@blocknote/mantine": "0.54.0",
+        "@blocknote/react": "0.54.0",
+        "@blocknote/xl-multi-column": "0.54.0",
+        "esbuild": "^0.25.0",
+        "react": "^19.2.8",
+        "react-dom": "^19.2.8",
+        "vitest": "^3.2.0"
+    }
+}
