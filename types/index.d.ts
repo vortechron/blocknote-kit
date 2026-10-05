@@ -87,6 +87,10 @@ export interface BlockEditorProps {
     onEditorReady?: (editor: any) => void;
     /** Extra classes for the surface. */
     className?: string;
+    /** The host app's own blocks, such as an order button. Read once, on mount. */
+    blockSpecs?: Record<string, any>;
+    /** "/" menu entries for those blocks. */
+    slashMenuItems?: (editor: any) => any[];
 }
 
 export function BlockEditor(props: BlockEditorProps): ReactElement;
@@ -98,9 +102,9 @@ export interface BlockEditorHandle {
 
 export function mountBlockEditor(element: HTMLElement, props?: BlockEditorProps): BlockEditorHandle;
 
-export function createKitSchema(options?: { fonts?: FontOption[] }): any;
+export function createKitSchema(options?: { fonts?: FontOption[]; blockSpecs?: Record<string, any> }): any;
 export function kitEditorOptions(): { dropCursor: unknown; dictionary: Record<string, unknown> };
-export function kitSlashMenuItems(editor: any): any[];
+export function kitSlashMenuItems(editor: any, extraItems?: any[]): any[];
 export function normalizeDocument(document: unknown): BlockDocument | undefined;
 
 export function appearanceToSurface(appearance?: Appearance): Surface;

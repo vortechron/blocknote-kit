@@ -20,7 +20,7 @@ The [Filament plugin](https://github.com/vortechron/filament-block-editor) is bu
 ## Install
 
 ```bash
-npm install github:vortechron/blocknote-kit#v0.1.1 \
+npm install github:vortechron/blocknote-kit#v0.2.0 \
   @blocknote/core@0.54.0 @blocknote/react@0.54.0 @blocknote/mantine@0.54.0 @blocknote/xl-multi-column@0.54.0 \
   react react-dom
 ```
@@ -83,6 +83,8 @@ editor.unmount();
 | `surface` | `false` when your page draws the section surface itself. |
 | `trackInsertTargets` | Let `insertText()` drop text into this editor. |
 | `onEditorReady(editor)` | The BlockNote editor instance. |
+| `blockSpecs` | Your app's own blocks, added to the kit schema. Read once, on mount. |
+| `slashMenuItems(editor)` | `/` menu entries for those blocks. |
 
 ### `media`
 
@@ -118,6 +120,32 @@ import { createKitSchema, kitEditorOptions, kitSlashMenuItems } from '@vortechro
 
 const editor = useCreateBlockNote({ schema: createKitSchema({ fonts }), ...kitEditorOptions() });
 ```
+
+## Your own blocks
+
+Add blocks only your app has, such as an order button, next to the kit blocks:
+
+```jsx
+import { createReactBlockSpec } from '@blocknote/react';
+import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core';
+import { SPACING_PROP_SCHEMA } from '@vortechron/blocknote-kit';
+
+const orderButton = createReactBlockSpec(
+    { type: 'orderButton', propSchema: { label: { default: 'Order now' }, ...SPACING_PROP_SCHEMA }, content: 'none' },
+    { render: ({ block }) => <a className="button">{block.props.label}</a> },
+);
+
+<BlockEditor
+    blockSpecs={{ orderButton: orderButton() }}
+    slashMenuItems={(editor) => [{
+        title: 'Order button',
+        group: 'Sales',
+        onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, { type: 'orderButton' }),
+    }]}
+/>
+```
+
+Your server renderer has to draw these blocks too.
 
 ## Insert at the caret
 

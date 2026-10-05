@@ -1285,13 +1285,16 @@ function columnSlashMenuItems(editor) {
 }
 
 // src/schema.jsx
-function createKitSchema({ fonts = [] } = {}) {
+function createKitSchema({ fonts = [], blockSpecs = {} } = {}) {
   return withMultiColumn(BlockNoteSchema.create({
-    blockSpecs: withItemProps(withVideoEmbeds({
-      ...defaultBlockSpecs,
-      spacer: spacerSpec(),
-      card: cardSpec()
-    })),
+    blockSpecs: {
+      ...withItemProps(withVideoEmbeds({
+        ...defaultBlockSpecs,
+        spacer: spacerSpec(),
+        card: cardSpec()
+      })),
+      ...blockSpecs
+    },
     styleSpecs: {
       ...defaultStyleSpecs,
       fontFamily: fontFamilyStyleSpec(fonts)
@@ -1311,11 +1314,12 @@ function kitEditorOptions() {
     }
   };
 }
-function kitSlashMenuItems(editor) {
+function kitSlashMenuItems(editor, extraItems = []) {
   return combineByGroup(
     getDefaultReactSlashMenuItems(editor),
     columnSlashMenuItems(editor),
-    [spacerSlashMenuItem(editor), cardSlashMenuItem(editor)]
+    [spacerSlashMenuItem(editor), cardSlashMenuItem(editor)],
+    extraItems
   );
 }
 
@@ -1332,12 +1336,14 @@ function BlockEditor({
   surface = true,
   trackInsertTargets = false,
   onEditorReady,
-  className = ""
+  className = "",
+  blockSpecs,
+  slashMenuItems
 }) {
   const hostRef = useRef3(null);
   const startingContent = useMemo(() => normalizeDocument(initialContent), []);
   const editor = useCreateBlockNote({
-    schema: createKitSchema({ fonts }),
+    schema: createKitSchema({ fonts, blockSpecs }),
     ...kitEditorOptions(),
     initialContent: startingContent,
     uploadFile
@@ -1385,7 +1391,7 @@ function BlockEditor({
           SuggestionMenuController,
           {
             triggerCharacter: "/",
-            getItems: async (query) => filterSuggestionItems(kitSlashMenuItems(editor), query)
+            getItems: async (query) => filterSuggestionItems(kitSlashMenuItems(editor, slashMenuItems?.(editor) ?? []), query)
           }
         ),
         /* @__PURE__ */ jsx8(BlockItemControls, { editor, editable })

@@ -37,6 +37,8 @@ import { createKitSchema, kitEditorOptions, kitSlashMenuItems } from './schema.j
  * @param {boolean} [props.trackInsertTargets=false] let insertText() drop text into this editor
  * @param {(editor) => void} [props.onEditorReady]
  * @param {string} [props.className] extra classes for the surface
+ * @param {Record<string, object>} [props.blockSpecs] the host app's own blocks, read once on mount (see createKitSchema)
+ * @param {(editor) => Array<object>} [props.slashMenuItems] "/" menu entries for those blocks
  */
 export function BlockEditor({
     initialContent,
@@ -50,12 +52,14 @@ export function BlockEditor({
     trackInsertTargets = false,
     onEditorReady,
     className = '',
+    blockSpecs,
+    slashMenuItems,
 }) {
     const hostRef = useRef(null);
     const startingContent = useMemo(() => normalizeDocument(initialContent), []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const editor = useCreateBlockNote({
-        schema: createKitSchema({ fonts }),
+        schema: createKitSchema({ fonts, blockSpecs }),
         ...kitEditorOptions(),
         initialContent: startingContent,
         uploadFile,
@@ -102,7 +106,7 @@ export function BlockEditor({
             />
             <SuggestionMenuController
                 triggerCharacter="/"
-                getItems={async (query) => filterSuggestionItems(kitSlashMenuItems(editor), query)}
+                getItems={async (query) => filterSuggestionItems(kitSlashMenuItems(editor, slashMenuItems?.(editor) ?? []), query)}
             />
             <BlockItemControls editor={editor} editable={editable} />
         </BlockNoteView>

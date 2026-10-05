@@ -24,17 +24,24 @@ import { withVideoEmbeds } from './video-embed.js';
  * a spacer, a fold-out card, two and three column layouts that can be resized,
  * and a font family style.
  *
- * @param {{ fonts?: Array<{ value: string, label: string, stack: string }> }} options
+ * `blockSpecs` adds the host app's own blocks, such as an order button. They
+ * are used as given: to offer "Space above" and "Space below" on one, put
+ * SPACING_PROP_SCHEMA in its propSchema.
+ *
+ * @param {{ fonts?: Array<{ value: string, label: string, stack: string }>, blockSpecs?: Record<string, object> }} options
  */
-export function createKitSchema({ fonts = [] } = {}) {
+export function createKitSchema({ fonts = [], blockSpecs = {} } = {}) {
     // withMultiColumn adds its own columnList spec, so the extended one has to
     // replace it afterwards.
     return withMultiColumn(BlockNoteSchema.create({
-        blockSpecs: withItemProps(withVideoEmbeds({
-            ...defaultBlockSpecs,
-            spacer: spacerSpec(),
-            card: cardSpec(),
-        })),
+        blockSpecs: {
+            ...withItemProps(withVideoEmbeds({
+                ...defaultBlockSpecs,
+                spacer: spacerSpec(),
+                card: cardSpec(),
+            })),
+            ...blockSpecs,
+        },
         styleSpecs: {
             ...defaultStyleSpecs,
             fontFamily: fontFamilyStyleSpec(fonts),
@@ -61,13 +68,17 @@ export function kitEditorOptions() {
 }
 
 /**
- * Every "/" menu entry: BlockNote's own, two and three columns, the spacer
- * and the card.
+ * Every "/" menu entry: BlockNote's own, two and three columns, the spacer,
+ * the card, and any entries the host app adds for its own blocks.
+ *
+ * @param {object} editor
+ * @param {Array<object>} [extraItems] the host app's entries
  */
-export function kitSlashMenuItems(editor) {
+export function kitSlashMenuItems(editor, extraItems = []) {
     return combineByGroup(
         getDefaultReactSlashMenuItems(editor),
         columnSlashMenuItems(editor),
         [spacerSlashMenuItem(editor), cardSlashMenuItem(editor)],
+        extraItems,
     );
 }

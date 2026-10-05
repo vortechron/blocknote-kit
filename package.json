@@ -1,6 +1,6 @@
 {
     "name": "@vortechron/blocknote-kit",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "Extra blocks and tools for BlockNote: resizable columns, per-item width and spacing, a spacer, fold-out cards, video embeds, a font picker, a media library sheet and section backgrounds.",
     "keywords": ["blocknote", "editor", "page-builder", "react", "columns", "notion"],
     "license": "GPL-3.0-or-later",
