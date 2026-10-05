@@ -86,6 +86,13 @@ function swapForEmbed(dom, block, embedUrl) {
 
 // src/appearance.js
 var SPACING = { none: "0", sm: "1rem", md: "2rem", lg: "3.5rem", xl: "6rem" };
+var FLUID_SPACING = {
+  none: "0",
+  sm: "1rem",
+  md: "clamp(1.25rem, 3.2vw, 2rem)",
+  lg: "clamp(1.5rem, 5vw, 3.5rem)",
+  xl: "clamp(1.5rem, 7.5vw, 6rem)"
+};
 var CONTENT_WIDTHS = { narrow: "42rem", normal: "53rem", wide: "72rem", full: "none" };
 var POSITIONS = {
   center: "center",
@@ -173,7 +180,7 @@ function withQuery(url, parameters) {
 }
 function appearanceToSurface(input = {}) {
   const appearance = { ...DEFAULT_APPEARANCE, ...withoutUndefined(input) };
-  const padding = SPACING[appearance.padding] ?? SPACING.md;
+  const padding = FLUID_SPACING[appearance.padding] ?? FLUID_SPACING.md;
   const width = CONTENT_WIDTHS[appearance.contentWidth] ?? CONTENT_WIDTHS.normal;
   const style = {
     padding,
@@ -1442,6 +1449,7 @@ export {
   ColumnsIcon,
   DEFAULT_APPEARANCE,
   DEFAULT_TINT_COLOR,
+  FLUID_SPACING,
   FONT_FAMILY_STYLE,
   FontFamilySelect,
   ITEM_SPACING,

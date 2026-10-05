@@ -44,7 +44,7 @@ describe('appearanceToSurface', () => {
     it('gives a plain section padding and a text width only', () => {
         expect(appearanceToSurface()).toEqual({
             className: '',
-            style: { padding: '2rem', '--bnk-block-pad': '2rem', '--bnk-block-width': '53rem' },
+            style: { padding: 'clamp(1.25rem, 3.2vw, 2rem)', '--bnk-block-pad': 'clamp(1.25rem, 3.2vw, 2rem)', '--bnk-block-width': '53rem' },
             video: null,
         });
     });
@@ -54,7 +54,7 @@ describe('appearanceToSurface', () => {
 
         expect(style['--bnk-block-width']).toBe('100%');
         expect(style.minHeight).toBe('70vh');
-        expect(style.padding).toBe('6rem');
+        expect(style.padding).toBe('clamp(1.5rem, 7.5vw, 6rem)');
     });
 
     it('paints a dark colour with white text and a light one without', () => {
@@ -120,5 +120,13 @@ describe('backgroundVideoEmbedUrl', () => {
     it('keeps a Vimeo privacy hash and adds its background flags after it', () => {
         expect(backgroundVideoEmbedUrl('https://vimeo.com/76979871/abc123def'))
             .toBe('https://player.vimeo.com/video/76979871?h=abc123def&background=1&autoplay=1&muted=1&loop=1');
+    });
+});
+
+describe('surface padding', () => {
+    it('shrinks on a small screen and stops at the full size, like the public page', () => {
+        expect(appearanceToSurface({ padding: 'xl' }).style.padding).toBe('clamp(1.5rem, 7.5vw, 6rem)');
+        expect(appearanceToSurface({ padding: 'sm' }).style.padding).toBe('1rem');
+        expect(appearanceToSurface({ padding: 'none' }).style.padding).toBe('0');
     });
 });

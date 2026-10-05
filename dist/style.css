@@ -15,6 +15,11 @@
 .bnk-blocknote .bn-container {
   position: relative;
 }
+@media (max-width: 640px) {
+  .bnk-blocknote .bn-editor {
+    padding-inline: 1.75rem;
+  }
+}
 .bnk-blocknote-has-bg {
   position: relative;
   isolation: isolate;

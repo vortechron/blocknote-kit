@@ -18,6 +18,21 @@ import { videoEmbedUrl } from './video-embed.js';
 /** Padding presets, the same names and sizes the page renderer uses. */
 export const SPACING = { none: '0', sm: '1rem', md: '2rem', lg: '3.5rem', xl: '6rem' };
 
+/**
+ * The same presets for the section padding: they shrink with the screen, stop
+ * at SPACING on a laptop, and never drop below a small floor on a phone. At a
+ * fixed 3.5rem or 6rem a phone had almost no room left for the text.
+ *
+ * Keep in sync with BlockSpacing::fluidCss() in the page renderer.
+ */
+export const FLUID_SPACING = {
+    none: '0',
+    sm: '1rem',
+    md: 'clamp(1.25rem, 3.2vw, 2rem)',
+    lg: 'clamp(1.5rem, 5vw, 3.5rem)',
+    xl: 'clamp(1.5rem, 7.5vw, 6rem)',
+};
+
 /** The widest the text column may grow. `full` is edge to edge. */
 export const CONTENT_WIDTHS = { narrow: '42rem', normal: '53rem', wide: '72rem', full: 'none' };
 
@@ -157,7 +172,7 @@ function withQuery(url, parameters) {
  */
 export function appearanceToSurface(input = {}) {
     const appearance = { ...DEFAULT_APPEARANCE, ...withoutUndefined(input) };
-    const padding = SPACING[appearance.padding] ?? SPACING.md;
+    const padding = FLUID_SPACING[appearance.padding] ?? FLUID_SPACING.md;
     const width = CONTENT_WIDTHS[appearance.contentWidth] ?? CONTENT_WIDTHS.normal;
 
     // --bnk-block-pad lets a stretched item cancel this padding, the same way

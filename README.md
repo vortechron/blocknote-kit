@@ -20,7 +20,7 @@ The [Filament plugin](https://github.com/vortechron/filament-block-editor) is bu
 ## Install
 
 ```bash
-npm install github:vortechron/blocknote-kit#v0.1.0 \
+npm install github:vortechron/blocknote-kit#v0.1.1 \
   @blocknote/core@0.54.0 @blocknote/react@0.54.0 @blocknote/mantine@0.54.0 @blocknote/xl-multi-column@0.54.0 \
   react react-dom
 ```
@@ -105,7 +105,7 @@ upload(file) => Promise<unknown>
 | `blur` | 0–20 px |
 | `position` | `'center'`, `'top'`, `'top-left'`, ... |
 | `card` | put the text on a white card |
-| `padding` | `'none'`, `'sm'`, `'md'`, `'lg'`, `'xl'` |
+| `padding` | `'none'`, `'sm'`, `'md'`, `'lg'`, `'xl'`. Shrinks on small screens (`FLUID_SPACING`). |
 | `contentWidth` | `'narrow'`, `'normal'`, `'wide'`, `'full'` |
 | `fullHeight` | grow to most of the screen |
 

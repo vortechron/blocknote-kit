@@ -10,6 +10,7 @@ export {
     CONTENT_WIDTHS,
     DEFAULT_APPEARANCE,
     DEFAULT_TINT_COLOR,
+    FLUID_SPACING,
     hexColor,
     isDarkColor,
     MAX_BLUR,

@@ -36,6 +36,16 @@
     position: relative;
 }
 
+/* BlockNote keeps 54px each side for its drag handle. On a phone that, plus
+   the section padding, left a column a few words wide. A media query, not a
+   container query: a container here breaks BlockNote's floating menus. Both
+   sides stay equal, so stretched items still centre. */
+@media (max-width: 640px) {
+    .bnk-blocknote .bn-editor {
+        padding-inline: 1.75rem;
+    }
+}
+
 /* Live background preview while editing. The wrapper carries a flat colour
    and a set of --bnk-bg-* variables via an inline style (see
    appearanceToSurface()); the picture and the tint are

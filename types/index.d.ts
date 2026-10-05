@@ -109,6 +109,8 @@ export function hexColor(value: unknown, fallback?: string | null): string | nul
 export function isDarkColor(value: unknown): boolean;
 export function resolveBackgroundType(appearance: Appearance): 'color' | 'image' | 'video';
 export const SPACING: Record<Spacing, string>;
+/** SPACING for the section padding, shrinking on small screens. */
+export const FLUID_SPACING: Record<Spacing, string>;
 export const CONTENT_WIDTHS: Record<ContentWidth, string>;
 export const POSITIONS: Record<BackgroundPosition, string>;
 export const DEFAULT_APPEARANCE: Readonly<Required<Appearance>>;
