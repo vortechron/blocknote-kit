@@ -68,17 +68,23 @@ export function kitEditorOptions() {
 }
 
 /**
- * Every "/" menu entry: BlockNote's own, two and three columns, the spacer,
- * the card, and any entries the host app adds for its own blocks.
+ * Every "/" menu entry: the host app's top entries first, then BlockNote's
+ * own, two and three columns, the spacer, the card, and any entries the host
+ * app adds for its own blocks.
  *
  * @param {object} editor
- * @param {Array<object>} [extraItems] the host app's entries
+ * @param {Array<object>} [extraItems] the host app's entries, after the kit's
+ * @param {Array<object>} [topItems] the host app's entries shown first, above
+ *     BlockNote's own groups, for what its users add most
  */
-export function kitSlashMenuItems(editor, extraItems = []) {
-    return combineByGroup(
-        getDefaultReactSlashMenuItems(editor),
-        columnSlashMenuItems(editor),
-        [spacerSlashMenuItem(editor), cardSlashMenuItem(editor)],
-        extraItems,
-    );
+export function kitSlashMenuItems(editor, extraItems = [], topItems = []) {
+    return [
+        ...topItems,
+        ...combineByGroup(
+            getDefaultReactSlashMenuItems(editor),
+            columnSlashMenuItems(editor),
+            [spacerSlashMenuItem(editor), cardSlashMenuItem(editor)],
+            extraItems,
+        ),
+    ];
 }

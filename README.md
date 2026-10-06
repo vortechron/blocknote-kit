@@ -85,6 +85,7 @@ editor.unmount();
 | `onEditorReady(editor)` | The BlockNote editor instance. |
 | `blockSpecs` | Your app's own blocks, added to the kit schema. Read once, on mount. |
 | `slashMenuItems(editor)` | `/` menu entries for those blocks. |
+| `slashMenuTopItems(editor)` | `/` menu entries shown first, above BlockNote's own. Called each time the menu opens. |
 
 ### `media`
 

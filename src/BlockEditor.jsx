@@ -39,6 +39,7 @@ import { createKitSchema, kitEditorOptions, kitSlashMenuItems } from './schema.j
  * @param {string} [props.className] extra classes for the surface
  * @param {Record<string, object>} [props.blockSpecs] the host app's own blocks, read once on mount (see createKitSchema)
  * @param {(editor) => Array<object>} [props.slashMenuItems] "/" menu entries for those blocks
+ * @param {(editor) => Array<object>} [props.slashMenuTopItems] "/" menu entries shown first, above BlockNote's own
  */
 export function BlockEditor({
     initialContent,
@@ -54,6 +55,7 @@ export function BlockEditor({
     className = '',
     blockSpecs,
     slashMenuItems,
+    slashMenuTopItems,
 }) {
     const hostRef = useRef(null);
     const startingContent = useMemo(() => normalizeDocument(initialContent), []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -106,7 +108,12 @@ export function BlockEditor({
             />
             <SuggestionMenuController
                 triggerCharacter="/"
-                getItems={async (query) => filterSuggestionItems(kitSlashMenuItems(editor, slashMenuItems?.(editor) ?? []), query)}
+                getItems={async (query) =>
+                    filterSuggestionItems(
+                        kitSlashMenuItems(editor, slashMenuItems?.(editor) ?? [], slashMenuTopItems?.(editor) ?? []),
+                        query,
+                    )
+                }
             />
             <BlockItemControls editor={editor} editable={editable} />
         </BlockNoteView>

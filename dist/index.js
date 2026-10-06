@@ -1314,13 +1314,16 @@ function kitEditorOptions() {
     }
   };
 }
-function kitSlashMenuItems(editor, extraItems = []) {
-  return combineByGroup(
-    getDefaultReactSlashMenuItems(editor),
-    columnSlashMenuItems(editor),
-    [spacerSlashMenuItem(editor), cardSlashMenuItem(editor)],
-    extraItems
-  );
+function kitSlashMenuItems(editor, extraItems = [], topItems = []) {
+  return [
+    ...topItems,
+    ...combineByGroup(
+      getDefaultReactSlashMenuItems(editor),
+      columnSlashMenuItems(editor),
+      [spacerSlashMenuItem(editor), cardSlashMenuItem(editor)],
+      extraItems
+    )
+  ];
 }
 
 // src/BlockEditor.jsx
@@ -1338,7 +1341,8 @@ function BlockEditor({
   onEditorReady,
   className = "",
   blockSpecs,
-  slashMenuItems
+  slashMenuItems,
+  slashMenuTopItems
 }) {
   const hostRef = useRef3(null);
   const startingContent = useMemo(() => normalizeDocument(initialContent), []);
@@ -1391,7 +1395,10 @@ function BlockEditor({
           SuggestionMenuController,
           {
             triggerCharacter: "/",
-            getItems: async (query) => filterSuggestionItems(kitSlashMenuItems(editor, slashMenuItems?.(editor) ?? []), query)
+            getItems: async (query) => filterSuggestionItems(
+              kitSlashMenuItems(editor, slashMenuItems?.(editor) ?? [], slashMenuTopItems?.(editor) ?? []),
+              query
+            )
           }
         ),
         /* @__PURE__ */ jsx8(BlockItemControls, { editor, editable })

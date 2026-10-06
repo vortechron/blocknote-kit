@@ -91,6 +91,11 @@ export interface BlockEditorProps {
     blockSpecs?: Record<string, any>;
     /** "/" menu entries for those blocks. */
     slashMenuItems?: (editor: any) => any[];
+    /**
+     * "/" menu entries shown first, above BlockNote's own groups. Called each
+     * time the menu opens, so the entries may follow the app's current state.
+     */
+    slashMenuTopItems?: (editor: any) => any[];
 }
 
 export function BlockEditor(props: BlockEditorProps): ReactElement;
@@ -104,7 +109,7 @@ export function mountBlockEditor(element: HTMLElement, props?: BlockEditorProps)
 
 export function createKitSchema(options?: { fonts?: FontOption[]; blockSpecs?: Record<string, any> }): any;
 export function kitEditorOptions(): { dropCursor: unknown; dictionary: Record<string, unknown> };
-export function kitSlashMenuItems(editor: any, extraItems?: any[]): any[];
+export function kitSlashMenuItems(editor: any, extraItems?: any[], topItems?: any[]): any[];
 export function normalizeDocument(document: unknown): BlockDocument | undefined;
 
 export function appearanceToSurface(appearance?: Appearance): Surface;
